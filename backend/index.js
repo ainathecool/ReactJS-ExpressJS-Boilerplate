@@ -3,36 +3,44 @@
  * Modify the code according to your own needs and requirements
  */
 
-//const express = require('express')
-import express from 'express'; // <-- Module Style import
-import bodyParser from 'body-parser';
+const express = require('express');
+const cors = require('cors'); //used for domain
+const mongoose = require('mongoose');
 
-// Importing user route
-import router from './routes/users.js';
-// const router = require('router')
+require('dotenv').config(); //
+const app = express();
 
-// const bodyParser = require('body-parser')
+//if env file ma port = 8000 dya wa tou idhar aesay port define
+const port = process.env.PORT || 8000; //address 
+//process.env.port means jo ismay port parra wa tou use this or 8000
+//filhaal process.env.port ma humnay 8000 he rakha wa
+//otherwise we can just do const port = 8000; if not defined in env file
 
-const app = express()
-const port = 3001
 
-app.use(bodyParser.json())
-// Adding a Router
-app.use('/users', router);
 
-app.get('/', (req, res) => {
-    res.send('Hello Universe!')
+//coneecting app w db
+const uri = process.env.ATLAS_URI; //atlasturi is connection string
+mongoose.connect(uri, {useNewUrlParser:true});
+const connection = mongoose.connection;
+connection.once('open', () => {
+    console.log("Connected to db");
 })
 
-app.get('/todos', (req, res) => {
-    res.send('A list of todo items will be returned')
-})
+app.use(cors());
+app.use(express.json());
 
-app.post('/', (req, res) => {
-    console.log(req.body)
-    res.send('Posting a Request')
-})
+//const CustomerRouter = require('./routes/customer');
+const AdminRouter = require('./routes/admin');
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+//app.use('/customer', CustomerRouter);
+app.use('/admin', AdminRouter); //localhost/3000/admin/and agay whatever fucntion eg add
+
+app.listen(port, () => { //tells us kis port pa app chal rhi hai
+    console.log(`Server is running on port: ${port}`);
+});
+
+
+
+
+
+
